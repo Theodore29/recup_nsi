@@ -1,6 +1,8 @@
 from tkinter import *
 from datetime import timedelta
 
+
+
 class Timer:
     def __init__(self, master):
         self.master = master
@@ -54,14 +56,6 @@ class Timer:
             self.label['text'] = 'Se tester'
         else:
             self.label['text'] = 'Démarrage'
-
-    def verif_marche(self):
-        if self.running == True :
-            return True
-
-    def verif_arret(self):
-        if self.running == False :
-            return False
 
 
 

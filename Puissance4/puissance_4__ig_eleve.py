@@ -4,16 +4,15 @@ import webbrowser
 from datetime import *
 import compteur
 import message_erreur
+import tkinter.font as tkFont
 
 
-
-
-
-##Docstring
 ## traduire gagner
 
 
 class Pion():
+    """Cette Class permet de construire un pion avec les attributs de placement (ligne/colonne) et de couleurs (jaune/rouge) """
+
     def __init__(self,colonne,ligne,couleur):
         self.colonne = colonne-1
         self.ligne = ligne
@@ -21,11 +20,13 @@ class Pion():
 
 
     def affiche_pions(self):
+        """Affichage en console d'un pion"""
         print("colonne",self.colonne+1)
 
 
 
     def afficher_gui(self,canvas):
+        """Affichage sur la grille d'un pion avec ses caractéristiques de positionnements et de couleurs """
         C = 70
         rayon = 30
         marge = 5
@@ -37,6 +38,7 @@ class Pion():
 
 
 class Grille:
+    """Class qui contient la grille ainsi que de la 'logique' du jeu (vérification de la victoire) """
     def __init__(self):
         self.pions = []
         self.pions_couleur = []
@@ -46,6 +48,7 @@ class Grille:
 
 
     def switch_joueur(self,pion):
+        """Permet d'alterner les couleurs (un coup rouge un coup jaune) """
         if  self.pions_couleur==[]:
             prochain_tour.set("C'est au tour du Rouge")
             pion.couleur = "yellow"
@@ -60,7 +63,8 @@ class Grille:
 
 
 
-    def check_winner(self,grille):
+    def verif_gagnant(self,grille):
+        """Permet de vérifier si un joueur a gagner (en vertical, en horizontal ou en diagonal) """
         directions = [(1, 0), (0, 1), (1, 1), (-1, 1)]  # Right, Up, Diagonal Up-Right, Diagonal Up-Left
         for pion in grille.pions:
             for dx, dy in directions:
@@ -77,6 +81,7 @@ class Grille:
         return False
 
     def renitialiser(self):
+        """Permet de remettre la grille a 0 ainsi que de la liste de liste de pion"""
         self.pions.clear()
         self.pions_couleur.clear()
         self.colonnes = [[] for i in range(7)]
@@ -85,9 +90,9 @@ class Grille:
 
 
     def ajouter_pions(self,pion):
+        """Permet d'ajouter un pion sur la grille en utilsant un systeme de liste de liste pour placer les pions """
         n=1
         col=self.colonnes[pion.colonne]
-
 
         if len(col) >= 6:
             mess_err=message_erreur.Message_erreur("Attention","données invalide vous êtes sortie de la grille")
@@ -111,12 +116,15 @@ class Grille:
 
 
     def afficher(self,canvas):
+        """Permet d'afficher les pions à leur bonne place"""
         for i in self.pions:
             i.afficher_gui(canvas)
 
 
 
 def initialisation() :
+    """Permet de créer la grille (fond bleu avec trou pour placer les pions)"""
+
     C=70
     for i in range(7):
         for j in range(6):
@@ -129,29 +137,39 @@ def initialisation() :
 
 
 Mafenetre = Tk()
+
+police = tkFont.Font(family="MV Boli", size=16)
 Mafenetre.title('Puissance 4')
 Mafenetre.geometry('650x755')
 Largeur = 490
 Hauteur = 420
 couleur1 = "blue"
 
-Canevas=Canvas(Mafenetre, width=Largeur, height=Hauteur, bg=couleur1 )
+
+Canevas=Canvas(Mafenetre, width=Largeur, height=Hauteur, bg=couleur1)
+
 
 
 
 message1=StringVar()
 message1.set("Colonne : ")
-Label(Mafenetre, textvariable=message1).pack(padx=1,pady=1)
+entrée_col=Label(Mafenetre, textvariable=message1)
+entrée_col.configure(font=police)
+entrée_col.pack(padx=1,pady=1)
+
 nombre1=StringVar()
 saisie1=Entry(Mafenetre)
 saisie1.configure(textvariable=nombre1,width=2)
+
 saisie1.pack()
 
 
 
 def renitialiser_jeu():
+    """Permet de remettre le jeu complétément a 0 avec confimation de l'utilisateur"""
     reset=message_erreur.Message_erreur("Rejouer ?","Voulez vous rejouer ?")
     reset.rejouer()
+    compteur1.stop()
     if reset.rejouer == "yes":
         grille.renitialiser()
         initialisation()
@@ -167,6 +185,8 @@ def renitialiser_jeu():
 
 
 def effacer_entree():
+    """Permet de remettre l'entrée (où l'utilisateur saisit la colonne) à 0 """
+
     nombre1.set("")
 
 
@@ -179,6 +199,7 @@ n1_verif=nombre1.get()
 
 
 def jouer():
+    """Fonction principale de jeu"""
     n1=int(nombre1.get())
     if n1 > 7 :
         mess_err=message_erreur.Message_erreur("Attention",f"données invalide ({n1}) : Veuillez entrez une colonne comprise entre 1 et 7 ")
@@ -195,7 +216,7 @@ def jouer():
     grille.ajouter_pions(pion1)
     grille.afficher(Canevas)
 
-    if grille.check_winner(grille):
+    if grille.verif_gagnant(grille):
         compteur1.reset()
         gagner=message_erreur.Message_erreur("Victoire",f"Le joueur {pion1.couleur} a gagné !")
         gagner.gagner()
@@ -207,17 +228,25 @@ def jouer():
 
 
 def jouer_touche(event):
+    """Permet de jouer en appuyant sur la touche entrée """
     jouer()
 
 def pub():
+    """Fonction pour l'utilsation du bouton 'afficher pub' """
     webbrowser.open('https://youtu.be/dQw4w9WgXcQ?feature=shared')
 
 def aide():
+    """PFonction pour l'utilisation du bouton d'aide """
     messagebox.showinfo("Aide", "Puissance 4, 2 joueurs, première couleur = Jaune", icon="info")
 
 
 
 initialisation()
+
+
+
+
+
 
 
 Mafenetre.bind('<Return>', jouer_touche)
@@ -226,6 +255,7 @@ Mafenetre.iconbitmap('icone.ico')
 prochain_tour=StringVar()
 prochain_tour.set("C'est au tour du Jaune")
 label_tour=Label(Mafenetre,textvariable=prochain_tour)
+label_tour.configure(font=police)
 
 
 BoutonJouer=Button(Mafenetre, text='Jouer', fg ='red', command=jouer)
